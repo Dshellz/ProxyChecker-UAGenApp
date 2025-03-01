@@ -1,4 +1,4 @@
-# ProxyCheckerApp
+# ProxyCheckerApp ✅
 
 Une application pour tester la validité des proxys. Avec une interface GUI simple et rapide.
 
