@@ -51,7 +51,7 @@ class ProxyCheckerApp(QWidget):
         self.apply_dark_theme()
 
     def initUI(self):
-        self.setWindowTitle("Proxys Checker")
+        self.setWindowTitle("Proxy Checker")
         self.setGeometry(100, 100, 500, 400)
         self.setWindowIcon(QIcon("ProxyCheckerApp/src/logo.png"))
 
