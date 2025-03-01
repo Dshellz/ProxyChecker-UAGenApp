@@ -64,7 +64,7 @@ class ProxyCheckerApp(QWidget):
         self.log_output.setReadOnly(True)
         layout.addWidget(self.log_output)
 
-        self.load_button = QPushButton("Charger un fichier de proxys", self)
+        self.load_button = QPushButton("Charger une liste de proxy", self)
         self.load_button.clicked.connect(self.load_proxy_file)
         layout.addWidget(self.load_button)
 
