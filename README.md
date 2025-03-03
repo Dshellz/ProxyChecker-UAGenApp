@@ -6,7 +6,7 @@ Une application pour tester la validité des proxys. Avec une interface GUI simp
 
 1. Clonez ce dépôt
 
-   git clone https://github.com/votre-utilisateur/ProxyCheckerApp.git
+   git clone https://github.com/Dshellz/ProxyCheckerApp.git
    cd ProxyCheckerApp
 
 2. Installez les dépendances
