@@ -1,9 +1,11 @@
 '''DSHELLZ LICENCE 2025'''
 import sys
 import requests
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QLabel, QFileDialog
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QLabel, QFileDialog, QTabWidget, QHBoxLayout
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtGui import QIcon
+from fake_useragent import UserAgent
+import pyperclip
 
 class ProxyCheckerThread(QThread):
     proxy_tested = pyqtSignal(str)
@@ -46,38 +48,66 @@ class ProxyCheckerApp(QWidget):
 
         self.proxy_list = []
         self.thread = None
-
         self.initUI()
         self.apply_dark_theme()
 
     def initUI(self):
-        self.setWindowTitle("Proxy Checker")
-        self.setGeometry(100, 100, 500, 400)
-        self.setWindowIcon(QIcon("ProxyCheckerApp/src/logo.png"))
+        self.setWindowTitle("Proxy Checker & UA Gen")
+        self.setGeometry(100, 100, 700, 600)
+        self.setWindowIcon(QIcon("logo.ico"))
 
         layout = QVBoxLayout()
+        self.tabs = QTabWidget()
+
+        self.proxy_checker_tab = QWidget()
+        self.proxy_checker_layout = QVBoxLayout()
 
         self.label = QLabel("Aucun fichier chargé", self)
-        layout.addWidget(self.label)
+        self.proxy_checker_layout.addWidget(self.label)
 
         self.log_output = QTextEdit(self)
         self.log_output.setReadOnly(True)
-        layout.addWidget(self.log_output)
+        self.proxy_checker_layout.addWidget(self.log_output)
 
         self.load_button = QPushButton("Charger une liste de proxy", self)
         self.load_button.clicked.connect(self.load_proxy_file)
-        layout.addWidget(self.load_button)
+        self.proxy_checker_layout.addWidget(self.load_button)
 
         self.start_button = QPushButton("Démarrer le test", self)
         self.start_button.clicked.connect(self.start_checking)
         self.start_button.setEnabled(False)
-        layout.addWidget(self.start_button)
-        
+        self.proxy_checker_layout.addWidget(self.start_button)
+
         self.stop_button = QPushButton("Arrêter le test", self)
         self.stop_button.clicked.connect(self.stop_checking)
         self.stop_button.setEnabled(False)
-        layout.addWidget(self.stop_button)
+        self.proxy_checker_layout.addWidget(self.stop_button)
 
+        self.proxy_checker_tab.setLayout(self.proxy_checker_layout)
+        self.tabs.addTab(self.proxy_checker_tab, "Proxy Checker")
+
+        self.user_agent_tab = QWidget()
+        self.user_agent_layout = QVBoxLayout()
+
+        self.ua_label = QLabel("Générateur de User-Agent", self)
+        self.user_agent_layout.addWidget(self.ua_label)
+
+        self.generated_ua = QTextEdit(self)
+        self.generated_ua.setReadOnly(True)
+        self.user_agent_layout.addWidget(self.generated_ua)
+
+        self.generate_button = QPushButton("Générer un User-Agent", self)
+        self.generate_button.clicked.connect(self.generate_user_agent)
+        self.user_agent_layout.addWidget(self.generate_button)
+
+        self.copy_button = QPushButton("Copier dans le presse-papiers", self)
+        self.copy_button.clicked.connect(self.copy_to_clipboard)
+        self.user_agent_layout.addWidget(self.copy_button)
+
+        self.user_agent_tab.setLayout(self.user_agent_layout)
+        self.tabs.addTab(self.user_agent_tab, "User-Agent Generator")
+
+        layout.addWidget(self.tabs)
         self.setLayout(layout)
 
     def apply_dark_theme(self):
@@ -104,13 +134,19 @@ class ProxyCheckerApp(QWidget):
         QLabel {
             color: #ffffff;
         }
-        QMainWindow::title {
-        background-color: #333333;
-        color: #ffffff;
+        QTabWidget {
+            background-color: #121212;
         }
-        QMainWindow {
-        background-color: #333333;
-        color: #ffffff;
+        QTabWidget::pane {
+            border: 1px solid #555555;
+        }
+        QTabBar::tab {
+            background-color: #333333;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        QTabBar::tab:selected {
+            background-color: #444444;
         }
         """
         self.setStyleSheet(dark_mode_qss)
@@ -138,7 +174,7 @@ class ProxyCheckerApp(QWidget):
         self.thread.proxy_tested.connect(self.log_output.append)
         self.thread.finished_signal.connect(self.checking_finished)
         self.thread.start()
-    
+
     def stop_checking(self):
         if self.thread:
             self.thread.stop()
@@ -150,10 +186,21 @@ class ProxyCheckerApp(QWidget):
         self.stop_button.setEnabled(False)
         self.start_button.setEnabled(True)
 
+    def generate_user_agent(self):
+        ua = UserAgent()
+        user_agent = ua.random
+        self.generated_ua.setPlainText(user_agent)
+
+    def copy_to_clipboard(self):
+        user_agent = self.generated_ua.toPlainText()
+        pyperclip.copy(user_agent)
+        self.log_output.append(f"User-Agent copié dans le presse-papiers: {user_agent}")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon("logo.ico"))
     window = ProxyCheckerApp()
     window.show()
     sys.exit(app.exec())
+
 '''DSHELLZ LICENCE 2025'''
